@@ -1,0 +1,36 @@
+{
+    "builders": [{
+        "type": "amazon-ebs",
+        "region": "eu-central-1",
+        "source_ami": "ami-0749e2c902c836c08", 
+        "instance_type": "t2.micro",
+        "ssh_username": "ec2-user",
+        "temporary_key_pair_type": "ed25519",
+        "ami_name": "jenkins-test {{timestamp}}",
+        "tags": {
+            "Name": "jenkins-test",
+            "Createdby": "ahmed.srebrenica",
+            "Project": "jenkins-test",
+            "IaC": "Packer"
+        },
+        "launch_block_device_mappings": [{
+            "device_name": "/dev/xvda",
+            "volume_size": 14,
+            "volume_type": "gp3"
+        }]
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "inline": [
+            "sudo yum update -y",
+            "sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo",
+            "sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key",
+            "sudo yum upgrade",
+            "sudo dnf install java-17-amazon-corretto -y",
+            "sudo yum install jenkins -y", 
+            "sudo systemctl enable jenkins",
+            "sudo systemctl start jenkins"
+        ]
+    }]
+}
+
